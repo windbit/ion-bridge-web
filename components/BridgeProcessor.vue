@@ -536,6 +536,21 @@ export default Vue.extend({
                     }
                 }
             }
+
+            if (this.state.step === 4) {
+                await this.finishIfMintedByOracles();
+            }
+        },
+        // The oracles may finish the voting themselves, and then the coins are already minted and voting again reverts
+        async finishIfMintedByOracles(): Promise<boolean> {
+            if (!this.isV2Swap || !await this.provider!.wtonContract.methods.finishedVotings(this.state.swapId!).call()) {
+                return false;
+            }
+
+            this.state.step = 5;
+            this.deleteState();
+            this.scheduleReset();
+            return true;
         },
         getSwapTonToEthId(web3: any, d: ISwapData): string {
             let encodedParams;
@@ -821,6 +836,10 @@ export default Vue.extend({
         async mint(): Promise<any> {
             let receipt;
             try {
+                if (await this.finishIfMintedByOracles()) {
+                    return;
+                }
+
                 let contractForAllowance = null;
                 if (this.isV2Swap) {
                     contractForAllowance = this.provider!.wtonContract;
@@ -865,14 +884,11 @@ export default Vue.extend({
 
                 // Whether ICE v2 is swapped (directly) instead of ICE v1 (through the router)
                 if (this.isV2Swap) {
-                    receipt = await this.provider!.wtonContract.methods.finishedVotings(this.state.swapId!).call()
-                    if (!receipt.status) {
-                        receipt = await this.provider!.wtonContract.methods.voteForMinting(this.state.swapData!, signatures).send({from: this.provider!.myEthAddress})
-                            .on('transactionHash', () => {
-                                this.state.toCurrencySent = true;
-                                this.deleteState();
-                            });
-                    }
+                    receipt = await this.provider!.wtonContract.methods.voteForMinting(this.state.swapData!, signatures).send({from: this.provider!.myEthAddress})
+                        .on('transactionHash', () => {
+                            this.state.toCurrencySent = true;
+                            this.deleteState();
+                        });
                 } else {
                     receipt = await this.provider!.ionBridgeRouter.methods.voteForMinting(this.state.swapData!, signatures).send({from: this.provider!.myEthAddress})
                         .on('transactionHash', () => {
