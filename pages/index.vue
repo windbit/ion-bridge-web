@@ -14,26 +14,6 @@
                     class="logo"
                 />
 
-                <div class="tabs">
-                    <button class="bridge-tab">
-                        <img
-                            src="~assets/pics/bridge-icon.svg"
-                            class="bridge-icon-gray"
-                            alt="Bridge"
-                        />
-                        Bridge
-                    </button>
-                    <button class="swap-tab" @click="openStaking()">
-                        <img
-                            src="~assets/pics/stack-icon.svg"
-                            class="meme-icon-blue"
-                            alt="Stake"
-                        />
-                        Staking
-                    </button>
-
-                </div>
-
                 <div class="connect-wallet-container">
                     <button
                         class="connect-wallet-button"
@@ -414,6 +394,7 @@ declare interface IComponentData {
     provider: any
 
     isEditingAddress: boolean
+    isAddressLocked: boolean
 
     feeFactor: number
 }
@@ -460,6 +441,7 @@ export default Vue.extend({
             accountAddress: '',
 
             isEditingAddress: true, // Address input is editable by default
+            isAddressLocked: false,
 
             feeFactor: 0
         }
@@ -674,6 +656,9 @@ export default Vue.extend({
         },
         // Toggle between display mode and editing mode
         toggleAddressEditing(isEditing: boolean) {
+            if (this.isAddressLocked) {
+                return
+            }
             if (!this.toAddress.trim()) {
                 this.isEditingAddress = true
                 return
@@ -746,6 +731,36 @@ export default Vue.extend({
             this.isConnected = false
             this.accountAddress = ''
             this.isDisconnectMenuVisible = false
+            if (this.isAddressLocked) {
+                this.isAddressLocked = false
+                this.toAddress = ''
+                this.isEditingAddress = true
+                this.isAddressInputVisible = false
+            }
+        },
+        // The receiver belongs to the same wallet on the other chain, so it is taken from the wallet and cannot be edited
+        async fillReceiverAddress() {
+            try {
+                let address: string | undefined
+                if (this.isFromTon) {
+                    if (window.ethereum) {
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+                        address = accounts && accounts[0]
+                    }
+                } else if (window.ion) {
+                    const accounts = await window.ion.send('ton_requestAccounts')
+                    address = accounts && accounts[0] && toNonBounceable(accounts[0])
+                }
+
+                if (address) {
+                    this.toAddress = address
+                    this.isAddressLocked = true
+                    this.isEditingAddress = false
+                    this.isAddressInputVisible = true
+                }
+            } catch (e) {
+                console.error('Failed to get the receiver address from the wallet', e)
+            }
         },
         showDisconnectMenu() {
             this.isDisconnectMenuVisible = !this.isDisconnectMenuVisible
@@ -783,6 +798,9 @@ export default Vue.extend({
             }
         },
         onAddressInputClicked() {
+            if (this.isAddressLocked) {
+                return
+            }
             this.isAddressInputVisible = true
             this.$nextTick(() => {
                 if (this.$refs.addressInput) {
@@ -812,9 +830,6 @@ export default Vue.extend({
                     console.log(`Fee factor: ${this.feeFactor}`);
                 }
             }, 1500);
-        },
-        openStaking() {
-            document.location.href = this.params.stakeUri
         },
         async connectWallet() {
             if (this.isFromTon) {
@@ -907,6 +922,10 @@ export default Vue.extend({
                 }
             }
 
+            if (this.isConnected) {
+                await this.fillReceiverAddress()
+            }
+
             // Trigger amount validation after successful connection
             if (this.amountInner) {
                 this.calculateHasEnoughICE(this.amountInner).then(
@@ -931,9 +950,11 @@ export default Vue.extend({
             this.lt = 0
             this.hash = ''
             this.amountInner = ''
-            this.toAddress = ''
-            this.isEditingAddress = true
-            this.isAddressInputVisible = false
+            if (!this.isAddressLocked) {
+                this.toAddress = ''
+                this.isEditingAddress = true
+                this.isAddressInputVisible = false
+            }
         },
         loadState(): void {
             if (!supportsLocalStorage) {
