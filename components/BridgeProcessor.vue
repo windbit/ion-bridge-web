@@ -1015,7 +1015,7 @@ export default Vue.extend({
             } else {
                 let myEthAddress;
                 try {
-                    const accounts = (await ethereum.send('eth_requestAccounts')).result;
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
                     myEthAddress = accounts[0];
                     console.log('address is', myEthAddress);
                 } catch (error) {
@@ -1023,9 +1023,9 @@ export default Vue.extend({
                     return null;
                 }
 
-                ethereum.addListener('accountsChanged', this.onAccountChanged);
+                ethereum.on('accountsChanged', this.onAccountChanged);
 
-                let chainId = (await ethereum.send('eth_chainId')).result;
+                let chainId = await ethereum.request({ method: 'eth_chainId' });
                 if (Number(chainId) !== this.params.chainId) {
                     const error = (this.$t('Bridge.errors.wrongMetamaskNetwork') as string)
                         .replace('<NETWORK>', this.$t(`Bridge.networks.${this.pair}.${this.netTypeName}.full`) as string)
