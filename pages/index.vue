@@ -452,7 +452,7 @@ export default Vue.extend({
             if (this.isFromTon) {
                 return "ION";
             } else {
-                return "ICE";
+                return "ION";
             }
         },
         secondName() {

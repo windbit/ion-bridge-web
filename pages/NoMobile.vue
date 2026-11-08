@@ -14,7 +14,7 @@
                     alt="Only desktop version supported"
                 />
                 <div class="text">
-                    <h1>The ICE Bridge is available only on desktop devices</h1>
+                    <h1>The ION Bridge is available only on desktop devices</h1>
                     <span
                         >To access, please visit this page on your desktop
                         browser.</span

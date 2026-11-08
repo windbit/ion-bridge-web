@@ -12,14 +12,14 @@
             "main": {
                 "name": "ION Network",
                 "full": "ION Network",
-                "coin": "ICE",
-                "coinShort": "ICE"
+                "coin": "ION",
+                "coinShort": "ION"
             },
             "test": {
                 "name": "ION Testnet",
                 "full": "ION Testnet",
-                "coin": "ICE",
-                "coinShort": "ICE"
+                "coin": "ION",
+                "coinShort": "ION"
             }
         },
         "eth": {
@@ -36,14 +36,14 @@
             "main": {
                 "name": "Ethereum",
                 "full": "Ethereum Network",
-                "coin": "ICE (ERC20)",
-                "coinShort": "ICE"
+                "coin": "ION (ERC20)",
+                "coinShort": "ION"
             },
             "test": {
                 "name": "Ethereum Goerli",
                 "full": "Ethereum Goerli",
-                "coin": "ICE (ERC20)",
-                "coinShort": "ICE"
+                "coin": "ION (ERC20)",
+                "coinShort": "ION"
             }
         },
         "bsc": {
@@ -60,26 +60,26 @@
             "main": {
                 "name": "Binance Smart Chain",
                 "full": "BSC Network",
-                "coin": "ICE (BEP-20)",
-                "coinShort": "ICE"
+                "coin": "ION (BEP-20)",
+                "coinShort": "ION"
             },
             "test": {
                 "name": "BSC Testnet",
                 "full": "BSC Testnet",
-                "coin": "ICE (BEP-20)",
-                "coinShort": "ICE"
+                "coin": "ION (BEP-20)",
+                "coinShort": "ION"
             }
         }
     },
-    "amountOfTon": "Amount of ICE:",
+    "amountOfTon": "Amount of ION:",
     "addressInputLabel": "Address to receive in <NETWORK>:",
-    "bridgeFeeAbove10": "Bridge fee - <FEE> ICE",
-    "bridgeFeeBelow10": "Bridge fee - 5 ICE + 0.25% of amount",
+    "bridgeFeeAbove10": "Bridge fee - <FEE> ION",
+    "bridgeFeeBelow10": "Bridge fee - 5 ION + 0.25% of amount",
     "sourceCode": "Source Code",
     "howItWorks": "How it works",
     "documentation": "Documentation",
     "transfer": "Transfer",
-    "getToncoin": "Get ICE",
+    "getToncoin": "Get ION",
     "done": "Done",
     "cancel": "Cancel",
     "blocksConfirmationsCollected": "Blocks confirmed",
@@ -92,9 +92,9 @@
     "getCoins": "Receiving <TO_COIN> in <TO_NETWORK>",
     "errors": {
         "notValidAmount": "Amount is not valid number",
-        "amountBelow10": "Amount must be at least 10 ICE",
+        "amountBelow10": "Amount must be at least 10 ION",
         "needPersonalAddress": "Please enter YOUR address to receive",
-        "toncoinBalance": "You have only <BALANCE> ICE",
+        "toncoinBalance": "You have only <BALANCE> ION",
         "installMetamask": "Please install MetaMask",
         "wrongMetamaskNetwork": "Set chain to <NETWORK> in Metamask"
     }
