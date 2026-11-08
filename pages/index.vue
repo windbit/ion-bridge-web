@@ -2149,16 +2149,43 @@ h1 {
         margin: 16px 0 24px;
     }
 
+    .menu {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+        width: calc(100% - 32px);
+        margin-top: 16px;
+        padding: 10px 10px 10px 16px;
+        background: #ffffff;
+        border-radius: 20px;
+    }
+
     .menu img.logo {
         position: relative;
         left: auto;
         top: auto;
-        height: 60px;
-        background: #ffffff;
-        width: 100%;
-        padding: 15px 0;
-        border-radius: 20px;
-        margin-bottom: 30px;
+        width: auto;
+        max-width: 50%;
+        height: 32px;
+        margin: 0;
+    }
+
+    .menu .connect-wallet-container {
+        right: auto;
+        margin: 0;
+        transform: none;
+    }
+
+    .menu .connect-wallet-button {
+        width: auto;
+        height: 44px;
+        white-space: nowrap;
+    }
+
+    .menu .disconnect-wallet-button {
+        right: 0;
+        z-index: 2;
     }
 }
 </style>
