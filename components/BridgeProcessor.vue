@@ -72,7 +72,7 @@ import IONSwap from '~/assets/IONSwap.json';
 import {ethers} from "ethers";
 import {Contract} from 'web3-eth-contract';
 import {AbiItem} from 'web3-utils';
-import { toUnit, toEther, fromUnit, fromEther, getNumber, getBool, decToHex, parseAddressFromDec } from '~/utils/helpers';
+import { toUnit, fromUnit, fromEther, getNumber, getBool, decToHex, parseAddressFromDec } from '~/utils/helpers';
 import {PARAMS} from '~/utils/constants';
 import keccak256 from 'keccak256'
 import DotsCycler from './DotsCycler.vue'
@@ -917,39 +917,15 @@ export default Vue.extend({
             const addressTon = new IonWeb.utils.Address(toAddress);
             const wc = addressTon.wc;
             const hashPart = IonWeb.utils.bytesToHex(addressTon.hashPart);
-            const amountUnit = toUnit(amount ? amount : 0);
-            const amountEther = toEther(amount ? amount : 0);
+            // ION on BSC has 9 decimals, like ION on ION Chain
+            const amountUnit = Web3.utils.toWei(String(amount ? amount : 0), 'gwei');
 
             console.log(`Address hash: 0x${hashPart}`);
-
-            // First check the allowance for ice1Contract
-            let currentAllowance = await this.provider!.ice1Contract.methods.allowance(
-                fromAddress,
-                this.provider!.ionBridgeRouter.options.address
-            ).call();
-            currentAllowance = new BN(currentAllowance);
-
-            // If allowance is less than amount, request approval
-            console.log(`Current allowance: ${currentAllowance}, expected amount: ${amountEther}`);
-            if (currentAllowance.lt(amountEther)) {
-                console.log('Requesting ICE token approval...');
-
-                // Now approve the actual amount
-                const approvalReceipt = await this.provider!.ice1Contract.methods.approve(
-                    this.provider!.ionBridgeRouter.options.address,
-                    amountEther
-                ).send({ from: fromAddress });
-
-                if (!approvalReceipt.status) {
-                    throw new Error('ICE token approval failed');
-                }
-                console.log('ICE token approval successful');
-            }
 
             let receipt;
 
             try {
-                receipt = await this.provider!.ionBridgeRouter.methods.burn(amountEther, {
+                receipt = await this.provider!.wtonContract.methods.burn(amountUnit, {
                     workchain: wc,
                     address_hash: '0x' + hashPart
                 }).send({from: fromAddress})
@@ -994,7 +970,7 @@ export default Vue.extend({
                         workchain: wc,
                         address_hash: hashPart
                     },
-                    value: amountUnit
+                    value: Number(amountUnit)
                 };
 
                 this.state.step = 2;
@@ -1251,7 +1227,7 @@ export default Vue.extend({
             }
 
             if (!this.isFromTon) {
-                const userErcBalance = fromUnit(Number(await (this.provider!.ice1Contract.methods.balanceOf(this.provider!.myEthAddress).call())));
+                const userErcBalance = fromUnit(Number(await (this.provider!.wtonContract.methods.balanceOf(this.provider!.myEthAddress).call())));
                 if (this.amount > userErcBalance) {
                     alert((this.$t('Bridge.errors.toncoinBalance') as string).replace('<BALANCE>', String(userErcBalance)));
                     return;

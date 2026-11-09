@@ -700,20 +700,19 @@ export default Vue.extend({
                 return amount <= balance
             } else {
                 // Handle BSC network balance check
-                if (!this.provider?.ice1Contract) {
+                if (!this.provider?.wtonContract) {
                     return false
                 }
 
                 try {
                     // Get balance from the WTON contract
-                    const balance = await this.provider.ice1Contract.methods
+                    const balance = await this.provider.wtonContract.methods
                         .balanceOf(this.accountAddress)
                         .call()
-                    const decimals = await this.provider.ice1Contract.methods
+                    const decimals = await this.provider.wtonContract.methods
                         .decimals()
                         .call()
 
-                    // Convert the entered value to Wei (assuming 18 decimals)
                     const cleanedValue = value.replace(/,/g, '') || '0'
                     const balanceInEther: number =
                         Number(balance) / Math.pow(10, decimals)
@@ -1171,20 +1170,17 @@ export default Vue.extend({
                 // Set the input amount to the fetched balance
                 this.amount = transferableBalance
             } else {
-                // Connected, but not to ICE v1
-                if (!this.provider.ice1Contract) {
+                if (!this.provider.wtonContract) {
                     return
                 }
 
-                // Fetch ICE balance and decimals
-                const rawBalance = await this.provider.ice1Contract.methods
+                const rawBalance = await this.provider.wtonContract.methods
                     .balanceOf(this.provider.myEthAddress)
                     .call()
-                const decimals = await this.provider.ice1Contract.methods
+                const decimals = await this.provider.wtonContract.methods
                     .decimals()
                     .call()
 
-                // Convert the entered value to Wei (assuming 18 decimals)
                 const balanceInEther: number =
                     Number(rawBalance) / Math.pow(10, decimals)
                 console.log(`Current ${this.firstName} balance: ${balanceInEther}`)
