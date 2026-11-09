@@ -1,5 +1,6 @@
 interface IParamsNetwork {
     getGasUrl: string
+    rpcUrl: string
     explorerUrl: string
     wTonAddress: string
     tonBridgeAddress: string
