@@ -533,7 +533,7 @@ export default Vue.extend({
             // return (this.$t(`Bridge.networks.${this.pair}.gasFee`) as string).replace('<FEE>', fee.toFixed(4));
 
             // v.2.0
-            return fee.toFixed(4)
+            return fee.toFixed(8).replace(/\.?0+$/, '')
         },
         amount: {
             get(): number {
@@ -1028,38 +1028,18 @@ export default Vue.extend({
             this.isFromTon = !this.isFromTon
         },
         async getPairGasFee(): Promise<void> {
-            /*
-            let data;
-            let gasPrice = 0;
-
             try {
-                const response = await fetch(this.params.getGasUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Cache-Control': 'no-store, max-age=0'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`An error has occured: ${response.status}`);
-                }
-
-                data = await response.json();
+                const response = await fetch(this.params.rpcUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_gasPrice', params: [] })
+                })
+                const { result } = await response.json()
+                this.gasPrice = parseInt(result, 16) / 1e9
             } catch (e) {
-                this.gasPrice = 0;
-                return;
+                console.error('Failed to fetch the BSC gas price', e)
+                this.gasPrice = 0
             }
-
-            if (this.pair === 'eth') {
-                gasPrice = parseFloat(data.average) / 10;
-            }
-
-            if (this.pair === 'bsc') {
-                gasPrice = parseFloat(data.result.SafeGasPrice);
-            }
-
-            this.gasPrice = gasPrice > 0 ? gasPrice : this.params.defaultGwei;
-             */
         },
         useMaximumTokenAmount: async function () {
             const self = this
